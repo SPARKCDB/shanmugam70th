@@ -1670,52 +1670,34 @@ function doRSVP(){
   if(!phone){alert('Please enter your phone number.');return;}
   if(!att){alert('Please indicate your attendance.');return;}
 
-  /* ── Google Form integration ──
-     Replace YOUR_FORM_ID and each entry.XXXX with your form's actual field IDs */
-  /* ── Submit to Google Form via hidden iframe POST ──
-     This is the only reliable method from a plain HTML file.
-     fetch/no-cors silently drops the submission in most browsers. */
-  const FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSfUV-c66Hx5_6Mzz4ZhnvZmJQvKo3ZXYl-DMFJ-rdAbt0wWGg/formResponse';
+  /* ══════════════════════════════════════════════════════
+     SUBMIT — Apps Script only (GitHub Pages / any host)
+     Uses URLSearchParams + no-cors so the preflight is
+     skipped and Apps Script receives the data correctly.
+     ══════════════════════════════════════════════════════ */
 
-  /* Build a hidden form and submit it into a hidden iframe */
-  let iframe=document.getElementById('gf-iframe');
-  if(!iframe){
-    iframe=document.createElement('iframe');
-    iframe.name='gf-iframe';
-    iframe.id='gf-iframe';
-    iframe.style.cssText='display:none;width:0;height:0;border:none;position:absolute;';
-    document.body.appendChild(iframe);
-  }
+  // ── APPS SCRIPT WEB APP URL (yogathipan@gmail.com) ──
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVZCjuKnNp3zmdmm5uDMzmfVRjhqc7Ez9TwCi2-KWyzb3yl5teQckn1vF9ndjX1lWh/exec';
 
-  const hf=document.createElement('form');
-  hf.method='POST';
-  hf.action=FORM_ACTION;
-  hf.target='gf-iframe'; /* submit into hidden iframe, no page redirect */
-  hf.style.display='none';
-
-  const fields={
-    'entry.1171574281': name,
-    'entry.1224241887': phone,
-    'entry.481867913':  document.getElementById('gemail').value,
-    'entry.774371638':  att==='yes'?'Joyfully Accepts':'Regretfully Declines',
-    'entry.404279443':  cnt.adults,
-    'entry.2034243974': cnt.children,
-    'entry.1888890328': cnt.adults+cnt.children,
-    'entry.447053458':  document.getElementById('dietary').value,
-    'entry.1641741011': document.getElementById('relation').value,
-    'entry.1221051637': document.getElementById('gmsg').value,
-  };
-
-  Object.entries(fields).forEach(([k,v])=>{
-    const inp=document.createElement('input');
-    inp.type='hidden'; inp.name=k; inp.value=v;
-    hf.appendChild(inp);
+  const payload = new URLSearchParams({
+    name:     name,
+    phone:    phone,
+    email:    document.getElementById('gemail').value,
+    attend:   att==='yes'?'Joyfully Accepts':'Regretfully Declines',
+    adults:   cnt.adults,
+    children: cnt.children,
+    total:    cnt.adults+cnt.children,
+    dietary:  document.getElementById('dietary').value,
+    relation: document.getElementById('relation').value,
+    msg:      document.getElementById('gmsg').value,
   });
 
-  document.body.appendChild(hf);
-  hf.submit();
-  /* Clean up the form element after submit */
-  setTimeout(()=>hf.remove(), 2000);
+  fetch(APPS_SCRIPT_URL, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:    payload.toString(),
+  }).catch(()=>{});
 
   document.getElementById('rsvpForm').style.display='none';
   const ok=document.getElementById('rsvpOk');
