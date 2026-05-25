@@ -71,12 +71,17 @@ body{
 }
 .nav-brand{
   font-family:'Italiana',serif;
-  font-size:clamp(.72rem,2vw,1.05rem);letter-spacing:.08em;
+  font-size:clamp(.68rem,2.2vw,1.05rem);
+  letter-spacing:.06em;
   color:var(--g3);
   text-shadow:0 0 20px rgba(212,168,67,.4);
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  flex:1;
 }
-.nav-links{display:flex;gap:40px;}
+.nav-links{display:flex;gap:40px;flex-shrink:0;}
 .nav-links a{
   font-family:'Didact Gothic',sans-serif;
   font-size:.58rem;letter-spacing:.45em;text-transform:uppercase;
@@ -84,7 +89,25 @@ body{
   transition:color .3s;
 }
 .nav-links a:hover{color:var(--g3);}
-@media(max-width:640px){.nav-links{display:none;}#nav{padding:18px 24px;}#nav.scrolled{padding:12px 24px;}}
+/* Lang toggle always visible, right-anchored */
+.lang-toggle{flex-shrink:0;}
+
+/* Mobile nav — hide links, keep brand short + lang toggle */
+@media(max-width:640px){
+  .nav-links{display:none;}
+  #nav{padding:12px 16px;gap:8px;}
+  #nav.scrolled{padding:10px 16px;}
+  .nav-brand{font-size:.72rem;letter-spacing:.03em;}
+  /* Shorten brand to just "Shanmugam · 70th" on mobile */
+  .nav-brand::after{display:none;}
+}
+@media(max-width:480px){
+  .nav-brand{
+    font-size:.65rem;
+    /* Hide long text, show short version via data attribute */
+    max-width:calc(100vw - 110px);
+  }
+}
 
 /* ═══════════════════════════════════════════
    HERO — FULL CINEMATIC
@@ -1106,9 +1129,13 @@ footer::after{
 <canvas id="ambient" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;"></canvas>
 
 <!-- ══════════ NAV ══════════ -->
-<nav id="nav">
-  <span class="nav-brand" data-en="Shanmugam's 70th Birthday Invitation" data-ta="சண்முகம் அவர்களின் 70வது பிறந்தநாள்">Shanmugam's 70th Birthday Invitation</span>
-  <div style="display:flex;align-items:center;gap:24px;">
+<nav id="nav" style="display:flex;align-items:center;gap:12px;">
+  <span class="nav-brand" id="nav-brand"
+    data-en="Shanmugam's 70th Birthday Invitation"
+    data-ta="சண்முகம் 70வது பிறந்தநாள்"
+    data-en-short="Shanmugam · 70th"
+    data-ta-short="சண்முகம் · 70வது">Shanmugam's 70th Birthday Invitation</span>
+  <div style="display:flex;align-items:center;gap:16px;margin-left:auto;flex-shrink:0;">
     <div class="nav-links">
       <a href="#details" data-en="Details" data-ta="விவரங்கள்">Details</a>
       <a href="#countdown" data-en="Countdown" data-ta="எண்ணிக்கை">Countdown</a>
@@ -1971,8 +1998,16 @@ function applyLang(lang){
   document.getElementById('lang-en').classList.toggle('active', lang==='en');
   document.getElementById('lang-ta').classList.toggle('active', lang==='ta');
 
-  /* All [data-en][data-ta] elements */
-  document.querySelectorAll('[data-en]').forEach(el=>{
+  /* Nav brand — use short version on mobile (≤640px) */
+  const brand = document.getElementById('nav-brand');
+  if(brand){
+    const isMobile = window.innerWidth <= 640;
+    const key = isMobile ? 'data-'+lang+'-short' : 'data-'+lang;
+    brand.textContent = brand.getAttribute(key) || brand.getAttribute('data-'+lang);
+  }
+
+  /* All [data-en][data-ta] elements except nav-brand (handled above) */
+  document.querySelectorAll('[data-en]:not(#nav-brand)').forEach(el=>{
     const val = el.getAttribute('data-'+lang);
     if(val) el.innerHTML = val;
   });
@@ -2049,6 +2084,9 @@ function toggleLang(){
     applyLang(saved);
   }
   /* else modal stays visible */
+
+  /* Re-apply on resize (portrait ↔ landscape) */
+  window.addEventListener('resize', ()=> applyLang(currentLang));
 })();
 
 </script>
