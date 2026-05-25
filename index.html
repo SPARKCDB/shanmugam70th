@@ -35,27 +35,14 @@ body{
   color:var(--cream);
   font-family:'Cormorant Garamond',Georgia,serif;
   overflow-x:hidden;
-  cursor:none;
 }
 
 /* ═══════════════════════════════════════════
    CUSTOM CURSOR
 ═══════════════════════════════════════════ */
-#cur-ring{
-  position:fixed;top:0;left:0;z-index:9999;pointer-events:none;
-  width:44px;height:44px;border-radius:50%;
-  border:1px solid var(--g2);
-  transform:translate(-50%,-50%);
-  transition:width .3s,height .3s,border-color .3s,opacity .25s;
-  opacity:.7; mix-blend-mode:screen;
-}
-#cur-dot{
-  position:fixed;top:0;left:0;z-index:9999;pointer-events:none;
-  width:4px;height:4px;border-radius:50%;
-  background:var(--g4);
-  transform:translate(-50%,-50%);
-}
-.cur-expand{width:64px!important;height:64px!important;border-color:var(--g4)!important;opacity:1!important;}
+/* Custom cursor hidden */
+#cur-ring,#cur-dot{display:none;}
+.cur-expand{}
 
 /* ═══════════════════════════════════════════
    SCROLL PROGRESS
@@ -813,22 +800,119 @@ footer::after{
 }
 .ft-script{
   font-family:'Satisfy',cursive;
-  font-size:clamp(36px,7vw,58px);color:var(--g3);
-  text-shadow:0 0 40px rgba(212,168,67,.35);
-  display:block;margin-bottom:8px;position:relative;z-index:2;
+  font-size:clamp(44px,9vw,72px);color:#ffffff;
+  text-shadow:0 0 40px rgba(212,168,67,.5);
+  display:block;margin-bottom:10px;position:relative;z-index:2;
 }
 .ft-hearts{
-  color:var(--g2);font-size:.9rem;letter-spacing:.7em;
-  display:block;margin-bottom:22px;
+  color:#ffffff;font-size:1.4rem;letter-spacing:.7em;
+  display:block;margin-bottom:28px;
   animation:hb 2.5s ease-in-out infinite;
   position:relative;z-index:2;
 }
-@keyframes hb{0%,100%{opacity:.7;transform:scale(1)}45%{opacity:1;transform:scale(1.1)}}
+@keyframes hb{0%,100%{opacity:.8;transform:scale(1)}45%{opacity:1;transform:scale(1.1)}}
 .ft-text{
-  font-family:'Didact Gothic',sans-serif;font-size:.55rem;
-  letter-spacing:.42em;text-transform:uppercase;
-  color:rgba(212,168,67,.28);line-height:2.6;
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1rem,2.5vw,1.3rem);
+  letter-spacing:.08em;
+  color:#ffffff;
+  line-height:2.2;
   position:relative;z-index:2;
+}
+
+/* ═══════════════════════════════════════════
+   LANGUAGE TOGGLE
+═══════════════════════════════════════════ */
+.lang-toggle{
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;
+  background:rgba(212,168,67,.08);
+  border:1px solid rgba(212,168,67,.25);
+  border-radius:20px;
+  padding:5px 14px;
+  transition:background .3s,border-color .3s;
+  flex-shrink:0;
+}
+.lang-toggle:hover{background:rgba(212,168,67,.15);border-color:var(--g2);}
+.lang-opt{
+  font-family:'Didact Gothic',sans-serif;
+  font-size:.6rem;letter-spacing:.2em;
+  color:rgba(212,168,67,.45);
+  transition:color .3s;
+  user-select:none;
+}
+.lang-opt.active{color:var(--g3);font-weight:700;}
+.lang-divider{color:rgba(212,168,67,.2);font-size:.6rem;}
+
+/* ═══════════════════════════════════════════
+   LANGUAGE SELECTION MODAL (on page load)
+═══════════════════════════════════════════ */
+#lang-modal{
+  position:fixed;inset:0;z-index:9500;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(5,4,3,.92);
+  backdrop-filter:blur(20px);
+  animation:riseUp .4s ease;
+}
+.lang-modal-card{
+  background:linear-gradient(145deg,#0f0c07,#1c1508);
+  border:1px solid rgba(212,168,67,.3);
+  border-radius:8px;
+  padding:clamp(36px,8vw,64px) clamp(28px,8vw,72px);
+  text-align:center;
+  max-width:480px;width:90%;
+  position:relative;overflow:hidden;
+  box-shadow:0 40px 80px rgba(0,0,0,.7);
+}
+.lang-modal-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--g0),var(--g2),var(--g4),var(--g2),var(--g0),transparent);
+}
+.lang-modal-icon{
+  font-size:2.5rem;display:block;margin-bottom:16px;
+  filter:drop-shadow(0 0 12px rgba(212,168,67,.5));
+}
+.lang-modal-title-en{
+  font-family:'Italiana',serif;
+  font-size:clamp(22px,5vw,36px);color:var(--cream);
+  margin-bottom:4px;
+}
+.lang-modal-title-ta{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(18px,4vw,28px);color:var(--g3);
+  margin-bottom:28px;
+}
+.lang-modal-sub{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:.95rem;color:var(--muted);margin-bottom:32px;
+  line-height:1.6;
+}
+.lang-modal-btns{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+.lang-modal-btn{
+  padding:16px 20px;
+  border:1px solid rgba(212,168,67,.25);
+  border-radius:4px;
+  background:rgba(255,255,255,.03);
+  cursor:pointer;
+  transition:all .3s ease;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.lang-modal-btn:hover{
+  border-color:var(--g2);
+  background:rgba(212,168,67,.1);
+  transform:translateY(-3px);
+  box-shadow:0 8px 24px rgba(212,168,67,.2);
+}
+.lang-modal-btn .lmb-flag{font-size:1.8rem;}
+.lang-modal-btn .lmb-name{
+  font-family:'Italiana',serif;
+  font-size:1.1rem;color:var(--cream);
+}
+.lang-modal-btn .lmb-native{
+  font-family:'Cormorant Garamond',serif;
+  font-size:.85rem;color:var(--g2);
 }
 
 /* ═══════════════════════════════════════════
@@ -991,6 +1075,28 @@ footer::after{
 </head>
 <body>
 
+<!-- ══════════ LANGUAGE SELECTION MODAL ══════════ -->
+<div id="lang-modal">
+  <div class="lang-modal-card">
+    <span class="lang-modal-icon">🎂</span>
+    <div class="lang-modal-title-en">Welcome</div>
+    <div class="lang-modal-title-ta">வரவேற்கிறோம்</div>
+    <p class="lang-modal-sub">Please select your preferred language<br>மொழியை தேர்ந்தெடுக்கவும்</p>
+    <div class="lang-modal-btns">
+      <button class="lang-modal-btn" onclick="setLang('en')">
+        <span class="lmb-flag">🇬🇧</span>
+        <span class="lmb-name">English</span>
+        <span class="lmb-native">English</span>
+      </button>
+      <button class="lang-modal-btn" onclick="setLang('ta')">
+        <span class="lmb-flag">🇮🇳</span>
+        <span class="lmb-name">Tamil</span>
+        <span class="lmb-native">தமிழ்</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- CURSOR -->
 <div id="cur-ring"></div>
 <div id="cur-dot"></div>
@@ -1003,11 +1109,19 @@ footer::after{
 
 <!-- ══════════ NAV ══════════ -->
 <nav id="nav">
-  <span class="nav-brand">Shanmugam's 70th Birthday Invitation</span>
-  <div class="nav-links">
-    <a href="#details">Details</a>
-    <a href="#countdown">Countdown</a>
-    <a href="#rsvp">RSVP</a>
+  <span class="nav-brand" data-en="Shanmugam's 70th Birthday Invitation" data-ta="சண்முகம் அவர்களின் 70வது பிறந்தநாள்">Shanmugam's 70th Birthday Invitation</span>
+  <div style="display:flex;align-items:center;gap:24px;">
+    <div class="nav-links">
+      <a href="#details" data-en="Details" data-ta="விவரங்கள்">Details</a>
+      <a href="#countdown" data-en="Countdown" data-ta="எண்ணிக்கை">Countdown</a>
+      <a href="#rsvp" data-en="RSVP" data-ta="RSVP">RSVP</a>
+    </div>
+    <!-- Language Toggle -->
+    <div class="lang-toggle" id="langToggle" onclick="toggleLang()">
+      <span class="lang-opt" id="lang-en">EN</span>
+      <span class="lang-divider">|</span>
+      <span class="lang-opt" id="lang-ta">தமிழ்</span>
+    </div>
   </div>
 </nav>
 
@@ -1068,7 +1182,7 @@ footer::after{
 
   <!-- CONTENT -->
   <div class="hero-content">
-    <span class="h-pre">You Are Cordially Invited To</span>
+    <span class="h-pre" id="hero-pre" data-en="You Are Cordially Invited To" data-ta="நீங்கள் அன்புடன் அழைக்கப்படுகிறீர்கள்">You Are Cordially Invited To</span>
 
     <!-- SVG ornament -->
     <div class="h-orn">
@@ -1120,16 +1234,16 @@ footer::after{
       </div>
     </div>
 
-    <h2 class="h-bday">Birthday</h2>
+    <h2 class="h-bday" id="hero-bday" data-en="Birthday" data-ta="பிறந்தநாள்">Birthday</h2>
 
     <div class="h-tag">
-      <span class="h-tag-label">Good Food · Great Company</span>
-      <span class="h-tag-script">Memories to Celebrate</span>
+      <span class="h-tag-label" id="hero-tag-label" data-en="Good Food · Great Company" data-ta="நல்ல உணவு · நல்ல நண்பர்கள்">Good Food · Great Company</span>
+      <span class="h-tag-script" id="hero-tag-script" data-en="Memories to Celebrate" data-ta="கொண்டாட்டமான நினைவுகள்">Memories to Celebrate</span>
     </div>
 
     <div class="h-cta">
-      <a href="#rsvp" class="btn-gold">RSVP Now</a>
-      <a href="#details" class="btn-ghost">View Details</a>
+      <a href="#rsvp" class="btn-gold" id="hero-cta-rsvp" data-en="RSVP Now" data-ta="உறுதிப்படுத்தவும்">RSVP Now</a>
+      <a href="#details" class="btn-ghost" id="hero-cta-details" data-en="View Details" data-ta="விவரங்கள் காண்க">View Details</a>
     </div>
   </div>
 
@@ -1143,8 +1257,8 @@ footer::after{
 <section class="details sec-wrap" id="details">
   <div class="details-inner">
     <div class="details-hdr reveal">
-      <span class="sec-eyebrow">The Celebration</span>
-      <h2 class="sec-title">Event Details</h2>
+      <span class="sec-eyebrow" id="det-eyebrow" data-en="The Celebration" data-ta="கொண்டாட்டம்">The Celebration</span>
+      <h2 class="sec-title" id="det-title" data-en="Event Details" data-ta="நிகழ்வு விவரங்கள்">Event Details</h2>
       <div class="orn-row" style="justify-content:center;max-width:240px;margin-left:auto;margin-right:auto;">
         <div class="orn-line l"></div>
         <div class="orn-dm-s"></div>
@@ -1158,7 +1272,7 @@ footer::after{
       <div class="d-card reveal" style="transition-delay:.08s">
         <div class="d-card-bg-num">01</div>
         <span class="d-icon">📍</span>
-        <span class="d-label">Venue</span>
+        <span class="d-label" id="det-lbl-venue" data-en="Venue" data-ta="இடம்">Venue</span>
         <p class="d-main">The Banggles</p>
         <p class="d-body">27 (M), Jalan Medan Setia 1<br>Bukit Damansara<br>50490 Kuala Lumpur<br>Wilayah Persekutuan</p>
         <div class="map-btns">
@@ -1175,16 +1289,16 @@ footer::after{
       <div class="d-card reveal" style="transition-delay:.18s">
         <div class="d-card-bg-num">02</div>
         <span class="d-icon">📅</span>
-        <span class="d-label">Date</span>
-        <p class="d-main">Saturday<br>27 June 2026</p>
-        <p class="d-body">Mark your calendars &amp;<br>save this golden date.</p>
+        <span class="d-label" id="det-lbl-date" data-en="Date" data-ta="தேதி">Date</span>
+        <p class="d-main" id="det-main-date" data-en="Saturday<br>27 June 2026" data-ta="சனிக்கிழமை<br>27 ஜூன் 2026">Saturday<br>27 June 2026</p>
+        <p class="d-body" id="det-body-date" data-en="Mark your calendars &amp;<br>save this golden date." data-ta="இந்த அழகிய தேதியை<br>குறித்து வையுங்கள்.">Mark your calendars &amp;<br>save this golden date.</p>
       </div>
       <div class="d-card reveal" style="transition-delay:.28s">
         <div class="d-card-bg-num">03</div>
         <span class="d-icon">🕖</span>
-        <span class="d-label">Time</span>
-        <p class="d-main">7:00 PM Onwards</p>
-        <p class="d-body">Doors open at 7:00 PM<br>Dinner served at 7:30 PM</p>
+        <span class="d-label" id="det-lbl-time" data-en="Time" data-ta="நேரம்">Time</span>
+        <p class="d-main" id="det-main-time" data-en="7:00 PM Onwards" data-ta="இரவு 7:00 மணி முதல்">7:00 PM Onwards</p>
+        <p class="d-body" id="det-body-time" data-en="Doors open at 7:00 PM<br>Dinner served at 7:30 PM" data-ta="கதவு திறக்கும் நேரம் 7:00 மணி<br>இரவு உணவு 7:30 மணிக்கு">Doors open at 7:00 PM<br>Dinner served at 7:30 PM</p>
       </div>
     </div>
   </div>
@@ -1194,29 +1308,29 @@ footer::after{
 <section class="countdown sec-wrap" id="countdown">
   <div class="cd-inner">
     <div class="reveal">
-      <span class="sec-eyebrow">Time Remaining</span>
-      <h2 class="sec-title">Counting Down</h2>
-      <p class="sec-sub">Until 27 June 2026 · 7:00 PM · Kuala Lumpur</p>
+      <span class="sec-eyebrow" id="cd-eyebrow" data-en="Time Remaining" data-ta="எஞ்சிய நேரம்">Time Remaining</span>
+      <h2 class="sec-title" id="cd-title" data-en="Counting Down" data-ta="எண்ணிக்கை">Counting Down</h2>
+      <p class="sec-sub" id="cd-sub" data-en="Until 27 June 2026 · 7:00 PM · Kuala Lumpur" data-ta="27 ஜூன் 2026 · மாலை 7:00 · கோலாலம்பூர்">Until 27 June 2026 · 7:00 PM · Kuala Lumpur</p>
     </div>
     <div class="cd-row reveal" style="transition-delay:.15s">
       <div class="cd-unit">
         <div class="cd-box"><span class="cd-n" id="cd-d">00</span></div>
-        <span class="cd-l">Days</span>
+        <span class="cd-l" id="cd-l-days">Days</span>
       </div>
       <div class="cd-sep">:</div>
       <div class="cd-unit">
         <div class="cd-box"><span class="cd-n" id="cd-h">00</span></div>
-        <span class="cd-l">Hours</span>
+        <span class="cd-l" id="cd-l-hours">Hours</span>
       </div>
       <div class="cd-sep">:</div>
       <div class="cd-unit">
         <div class="cd-box"><span class="cd-n" id="cd-m">00</span></div>
-        <span class="cd-l">Minutes</span>
+        <span class="cd-l" id="cd-l-mins">Minutes</span>
       </div>
       <div class="cd-sep">:</div>
       <div class="cd-unit">
         <div class="cd-box"><span class="cd-n" id="cd-s">00</span></div>
-        <span class="cd-l">Seconds</span>
+        <span class="cd-l" id="cd-l-secs">Seconds</span>
       </div>
     </div>
   </div>
@@ -1227,16 +1341,16 @@ footer::after{
   <div class="rsvp-wrap">
 
     <div class="rsvp-hdr reveal">
-      <span class="sec-eyebrow">Kindly Respond</span>
-      <h2 class="sec-title">RSVP</h2>
+      <span class="sec-eyebrow" data-en="Kindly Respond" data-ta="தயவுசெய்து பதிலளிக்கவும்">Kindly Respond</span>
+      <h2 class="sec-title" data-en="RSVP" data-ta="உறுதிப்படுத்தல்">RSVP</h2>
       <div class="orn-row" style="justify-content:center;max-width:200px;margin:14px auto 0;">
         <div class="orn-line l"></div>
         <div class="orn-dm"></div>
         <div class="orn-line r"></div>
       </div>
-      <p class="sec-sub" style="margin-top:12px;">We would be honoured by your gracious presence.</p>
+      <p class="sec-sub" style="margin-top:12px;" data-en="We would be honoured by your gracious presence." data-ta="உங்கள் வருகை எங்களுக்கு மகிழ்ச்சியாக இருக்கும்.">We would be honoured by your gracious presence.</p>
       <span class="deadline">
-        Reply by 15 June 2026
+        <span data-en="Reply by 15 June 2026" data-ta="15 ஜூன் 2026க்குள் பதிலளிக்கவும்">Reply by 15 June 2026</span>
         <span class="deadline-countdown" id="deadlineCountdown"></span>
       </span>
     </div>
@@ -1245,25 +1359,20 @@ footer::after{
 
       <div class="frow">
         <div class="fg">
-          <label>Full Name *</label>
+          <label data-en="Full Name *" data-ta="முழு பெயர் *">Full Name *</label>
           <input type="text" id="gname" placeholder="Your full name">
         </div>
         <div class="fg">
-          <label>Phone Number *</label>
+          <label data-en="Phone Number *" data-ta="தொலைபேசி எண் *">Phone Number *</label>
           <input type="tel" id="gphone" placeholder="+60 1X XXXX XXXX">
         </div>
       </div>
 
       <div class="ffull fg">
-        <label>Email Address</label>
-        <input type="email" id="gemail" placeholder="your@email.com">
-      </div>
-
-      <div class="ffull fg">
-        <label>Will You Be Attending? *</label>
+        <label data-en="Will You Be Attending? *" data-ta="நீங்கள் வருவீர்களா? *">Will You Be Attending? *</label>
         <div class="att-wrap">
-          <button type="button" class="att-btn" onclick="pickAtt(this,'yes')">✦ &nbsp;Joyfully Accepts</button>
-          <button type="button" class="att-btn" onclick="pickAtt(this,'no')">✕ &nbsp;Regretfully Declines</button>
+          <button type="button" class="att-btn" onclick="pickAtt(this,'yes')" data-en="✦  Joyfully Accepts" data-ta="✦  மகிழ்ச்சியுடன் ஏற்கிறேன்">✦ &nbsp;Joyfully Accepts</button>
+          <button type="button" class="att-btn" onclick="pickAtt(this,'no')" data-en="✕  Regretfully Declines" data-ta="✕  வர இயலாது">✕ &nbsp;Regretfully Declines</button>
         </div>
         <input type="hidden" id="attval">
       </div>
@@ -1272,7 +1381,7 @@ footer::after{
       <div class="pax-panel" id="paxPanel">
         <div class="pax-divider-row">
           <div class="pax-d-line a"></div>
-          <span class="pax-d-label">Number of Pax</span>
+          <span class="pax-d-label" data-en="Number of Pax" data-ta="பேர் எண்ணிக்கை">Number of Pax</span>
           <div class="pax-d-line b"></div>
         </div>
 
@@ -1340,7 +1449,7 @@ footer::after{
 
       <div class="frow">
         <div class="fg">
-          <label>Dietary Requirements</label>
+          <label id="dietary-label" data-en="Dietary Requirements" data-ta="உணவு தேவைகள்">Dietary Requirements</label>
           <select id="dietary">
             <option value="">None / No restriction</option>
             <option value="vegetarian">Vegetarian</option>
@@ -1351,7 +1460,7 @@ footer::after{
           </select>
         </div>
         <div class="fg">
-          <label>Your Relationship</label>
+          <label id="relation-label" data-en="Your Relationship" data-ta="உறவு முறை">Your Relationship</label>
           <select id="relation">
             <option value="">Please select</option>
             <option value="family">Family Member</option>
@@ -1364,17 +1473,17 @@ footer::after{
       </div>
 
       <div class="ffull fg">
-        <label>Birthday Wishes</label>
+        <label id="wishes-label" data-en="Birthday Wishes" data-ta="பிறந்தநாள் வாழ்த்துகள்">Birthday Wishes</label>
         <textarea id="gmsg" placeholder="Share warm words for Shanmugam's special milestone…"></textarea>
       </div>
 
-      <button class="form-sub" onclick="doRSVP()">Confirm My RSVP</button>
+      <button class="form-sub" id="form-submit-btn" data-en="Confirm My RSVP" data-ta="என் RSVP உறுதிப்படுத்து" onclick="doRSVP()">Confirm My RSVP</button>
     </div>
 
     <!-- SUCCESS -->
     <div class="rsvp-ok" id="rsvpOk">
       <span class="ok-ico">🎉</span>
-      <h3 class="ok-title">Thank You!</h3>
+      <h3 class="ok-title" id="ok-title-el" data-en="Thank You!" data-ta="நன்றி!">Thank You!</h3>
       <p class="ok-body" id="okMsg">We look forward to celebrating with you.</p>
       <span class="ok-stamp">27 June 2026 · 7PM · The Banggles, KL</span>
 
@@ -1434,12 +1543,12 @@ footer::after{
 
 <!-- ══════════ FOOTER ══════════ -->
 <footer>
-  <span class="ft-script">Memories to Celebrate</span>
+  <span class="ft-script" data-en="Memories to Celebrate" data-ta="கொண்டாட்டமான நினைவுகள்">Memories to Celebrate</span>
   <span class="ft-hearts">♥ &nbsp; ♥ &nbsp; ♥</span>
   <p class="ft-text">
-    Shanmugam's 70th Birthday Celebration<br>
-    27 June 2026 &nbsp;·&nbsp; The Banggles &nbsp;·&nbsp; Kuala Lumpur<br>
-    <span style="opacity:.5;font-size:.48rem;">With Love &amp; Warmth from the Family</span>
+    <span data-en="Shanmugam's 70th Birthday Celebration" data-ta="சண்முகம் அவர்களின் 70வது பிறந்தநாள் விழா">Shanmugam's 70th Birthday Celebration</span><br>
+    <span data-en="27 June 2026 · The Banggles · Kuala Lumpur" data-ta="27 ஜூன் 2026 · தி பேங்கிள்ஸ் · கோலாலம்பூர்">27 June 2026 &nbsp;·&nbsp; The Banggles &nbsp;·&nbsp; Kuala Lumpur</span><br>
+    <span data-en="With Love &amp; Warmth from the Family" data-ta="குடும்பத்தினரின் அன்புடன்">With Love &amp; Warmth from the Family</span>
   </p>
 </footer>
 
@@ -1682,7 +1791,7 @@ function doRSVP(){
   const payload = new URLSearchParams({
     name:     name,
     phone:    phone,
-    email:    document.getElementById('gemail').value,
+    email:    '',
     attend:   att==='yes'?'Joyfully Accepts':'Regretfully Declines',
     adults:   cnt.adults,
     children: cnt.children,
@@ -1784,6 +1893,165 @@ function toggleCal(){
   opts.style.display=visible?'none':'flex';
   btn.textContent=visible?'Add to Calendar':'✕ Close';
 }
+
+/* ══════════════════════════════════════════
+   LANGUAGE SYSTEM
+══════════════════════════════════════════ */
+let currentLang = 'en';
+
+/* All translations */
+const T = {
+  en: {
+    'page-title':        "Shanmugam's 70th Birthday",
+    'hero-pre':          'You Are Cordially Invited To',
+    'hero-bday':         'BIRTHDAY',
+    'hero-tag-label':    'Good Food · Great Company',
+    'hero-tag-script':   'Memories to Celebrate',
+    'hero-cta-rsvp':     'RSVP Now',
+    'hero-cta-details':  'View Details',
+    'det-eyebrow':       'The Celebration',
+    'det-title':         'Event Details',
+    'det-lbl-venue':     'Venue',
+    'det-lbl-date':      'Date',
+    'det-main-date':     'Saturday<br>27 June 2026',
+    'det-body-date':     'Mark your calendars &amp;<br>save this golden date.',
+    'det-lbl-time':      'Time',
+    'det-main-time':     '7:00 PM Onwards',
+    'det-body-time':     'Doors open at 7:00 PM<br>Dinner served at 7:30 PM',
+    'cd-eyebrow':        'Time Remaining',
+    'cd-title':          'Counting Down',
+    'cd-sub':            'Until 27 June 2026 · 7:00 PM · Kuala Lumpur',
+    'cd-days':           'Days','cd-hours':'Hours','cd-mins':'Minutes','cd-secs':'Seconds',
+    'rsvp-btn':          'RSVP Now',
+    'submit-btn':        'Confirm My RSVP',
+    'dietary-lbl':       'Dietary Requirements',
+    'relation-lbl':      'Your Relationship',
+    'wishes-lbl':        'Birthday Wishes',
+    'wishes-ph':         "Share warm words for Shanmugam's special milestone…",
+    'name-ph':           'Your full name',
+    'phone-ph':          '+60 1X XXXX XXXX',
+    'ok-title':          'Thank You!',
+  },
+  ta: {
+    'page-title':        'சண்முகம் 70வது பிறந்தநாள்',
+    'hero-pre':          'நீங்கள் அன்புடன் அழைக்கப்படுகிறீர்கள்',
+    'hero-bday':         'பிறந்தநாள்',
+    'hero-tag-label':    'நல்ல உணவு · நல்ல நண்பர்கள்',
+    'hero-tag-script':   'கொண்டாட்டமான நினைவுகள்',
+    'hero-cta-rsvp':     'உறுதிப்படுத்தவும்',
+    'hero-cta-details':  'விவரங்கள் காண்க',
+    'det-eyebrow':       'கொண்டாட்டம்',
+    'det-title':         'நிகழ்வு விவரங்கள்',
+    'det-lbl-venue':     'இடம்',
+    'det-lbl-date':      'தேதி',
+    'det-main-date':     'சனிக்கிழமை<br>27 ஜூன் 2026',
+    'det-body-date':     'இந்த அழகிய தேதியை<br>குறித்து வையுங்கள்.',
+    'det-lbl-time':      'நேரம்',
+    'det-main-time':     'இரவு 7:00 மணி முதல்',
+    'det-body-time':     'கதவு திறக்கும் நேரம் 7:00 மணி<br>இரவு உணவு 7:30 மணிக்கு',
+    'cd-eyebrow':        'எஞ்சிய நேரம்',
+    'cd-title':          'எண்ணிக்கை',
+    'cd-sub':            '27 ஜூன் 2026 · மாலை 7:00 · கோலாலம்பூர்',
+    'cd-days':           'நாட்கள்','cd-hours':'மணி','cd-mins':'நிமிடங்கள்','cd-secs':'வினாடிகள்',
+    'rsvp-btn':          'உறுதிப்படுத்தவும்',
+    'submit-btn':        'என் RSVP உறுதிப்படுத்து',
+    'dietary-lbl':       'உணவு தேவைகள்',
+    'relation-lbl':      'உறவு முறை',
+    'wishes-lbl':        'பிறந்தநாள் வாழ்த்துகள்',
+    'wishes-ph':         'சண்முகம் அவர்களுக்கு அன்பான வாழ்த்துகள் தெரிவிக்கவும்…',
+    'name-ph':           'உங்கள் பெயர்',
+    'phone-ph':          '+60 1X XXXX XXXX',
+    'ok-title':          'நன்றி!',
+  }
+};
+
+function applyLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang==='ta'?'ta':'en';
+
+  /* Nav toggle highlight */
+  document.getElementById('lang-en').classList.toggle('active', lang==='en');
+  document.getElementById('lang-ta').classList.toggle('active', lang==='ta');
+
+  /* All [data-en][data-ta] elements */
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    const val = el.getAttribute('data-'+lang);
+    if(val) el.innerHTML = val;
+  });
+
+  /* Specific IDs */
+  const s = T[lang];
+  document.title = s['page-title'];
+
+  const set=(id,val,prop='textContent')=>{
+    const el=document.getElementById(id);
+    if(el){ if(prop==='innerHTML') el.innerHTML=val; else el.textContent=val; }
+  };
+  const setph=(id,val)=>{ const el=document.getElementById(id); if(el) el.placeholder=val; };
+
+  set('hero-pre', s['hero-pre']);
+  set('hero-bday', s['hero-bday']);
+  set('hero-tag-label', s['hero-tag-label']);
+  set('hero-tag-script', s['hero-tag-script']);
+  set('hero-cta-rsvp', s['hero-cta-rsvp']);
+  set('hero-cta-details', s['hero-cta-details']);
+  set('det-eyebrow', s['det-eyebrow']);
+  set('det-title', s['det-title'], 'innerHTML');
+  set('det-lbl-venue', s['det-lbl-venue']);
+  set('det-lbl-date', s['det-lbl-date']);
+  set('det-main-date', s['det-main-date'], 'innerHTML');
+  set('det-body-date', s['det-body-date'], 'innerHTML');
+  set('det-lbl-time', s['det-lbl-time']);
+  set('det-main-time', s['det-main-time'], 'innerHTML');
+  set('det-body-time', s['det-body-time'], 'innerHTML');
+  set('cd-eyebrow', s['cd-eyebrow']);
+  set('cd-title', s['cd-title']);
+  set('cd-sub', s['cd-sub']);
+  set('cd-l-days', s['cd-days']);
+  set('cd-l-hours', s['cd-hours']);
+  set('cd-l-mins', s['cd-mins']);
+  set('cd-l-secs', s['cd-secs']);
+  set('form-submit-btn', s['submit-btn']);
+  set('dietary-label', s['dietary-lbl']);
+  set('relation-label', s['relation-lbl']);
+  set('wishes-label', s['wishes-lbl']);
+  set('ok-title-el', s['ok-title']);
+  setph('gname', s['name-ph']);
+  setph('gphone', s['phone-ph']);
+  setph('gmsg', s['wishes-ph']);
+
+  /* Countdown labels */
+  document.querySelectorAll('.cd-l').forEach((el,i)=>{
+    const keys=['cd-days','cd-hours','cd-mins','cd-secs'];
+    el.textContent = s[keys[i]]||el.textContent;
+  });
+
+  /* Store preference */
+  localStorage.setItem('sg70_lang', lang);
+}
+
+function setLang(lang){
+  /* Close modal */
+  const modal = document.getElementById('lang-modal');
+  modal.style.transition = 'opacity .4s ease';
+  modal.style.opacity = '0';
+  setTimeout(()=>{ modal.style.display='none'; }, 400);
+  applyLang(lang);
+}
+
+function toggleLang(){
+  applyLang(currentLang==='en'?'ta':'en');
+}
+
+/* On load — check saved preference or show modal */
+(function(){
+  const saved = localStorage.getItem('sg70_lang');
+  if(saved){
+    document.getElementById('lang-modal').style.display='none';
+    applyLang(saved);
+  }
+  /* else modal stays visible */
+})();
 
 </script>
 </body>
