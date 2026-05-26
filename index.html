@@ -319,8 +319,25 @@ body{
 }
 .h-tag-label{
   font-family:'Didact Gothic',sans-serif;
-  font-size:.58rem;letter-spacing:.45em;text-transform:uppercase;
-  color:rgba(212,168,67,.55);margin-bottom:6px;display:block;
+  font-size:clamp(.9rem,2.5vw,1.5rem);letter-spacing:.3em;text-transform:uppercase;
+  color:#ffffff;margin-bottom:6px;display:block;
+  text-shadow:0 0 24px rgba(255,255,255,.25);
+}
+.h-salutation{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:clamp(.9rem,2.2vw,1.3rem);letter-spacing:.35em;
+  color:var(--g3);display:block;
+  opacity:0;transform:translateY(12px);
+  animation:riseUp .9s cubic-bezier(.16,1,.3,1) .55s forwards;
+  margin-bottom:4px;
+}
+.h-father-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(.95rem,2.5vw,1.6rem);font-weight:400;
+  letter-spacing:.28em;color:var(--g3);display:block;
+  opacity:0;transform:translateY(12px);
+  animation:riseUp .9s cubic-bezier(.16,1,.3,1) 1.05s forwards;
+  margin-top:10px;
 }
 .h-tag-script{
   font-family:'Satisfy',cursive;
@@ -1138,7 +1155,7 @@ footer::after{
   <div style="display:flex;align-items:center;gap:16px;margin-left:auto;flex-shrink:0;">
     <div class="nav-links">
       <a href="#details" data-en="Details" data-ta="விவரங்கள்">Details</a>
-      <a href="#countdown" data-en="Countdown" data-ta="எண்ணிக்கை">Countdown</a>
+      <a href="#countdown" data-en="Countdown" data-ta="கவுண்ட்டவுன்">Countdown</a>
       <a href="#rsvp" data-en="RSVP" data-ta="RSVP">RSVP</a>
     </div>
     <!-- Language Toggle -->
@@ -1234,7 +1251,9 @@ footer::after{
     </div>
 
     <!-- ★ THE NAME — crystal clear, unmissable ★ -->
+    <span class="h-salutation" data-en="Mr" data-ta="திரு">Mr</span>
     <h1 class="h-name" data-name="SHANMUGAM">SHANMUGAM</h1>
+    <span class="h-father-name" data-en="Seerengam" data-ta="சீரெங்கம்">Seerengam</span>
 
     <div class="h-rule"></div>
 
@@ -1255,7 +1274,7 @@ footer::after{
           <circle cx="150" cy="150" r="124" stroke="rgba(212,168,67,.1)" stroke-width=".5"/>
         </svg>
         <span class="age-num">70</span>
-        <span class="age-th">th</span>
+        <span class="age-th" data-en="th" data-ta="வது">th</span>
       </div>
     </div>
 
@@ -1334,7 +1353,7 @@ footer::after{
   <div class="cd-inner">
     <div class="reveal">
       <span class="sec-eyebrow" id="cd-eyebrow" data-en="Time Remaining" data-ta="எஞ்சிய நேரம்">Time Remaining</span>
-      <h2 class="sec-title" id="cd-title" data-en="Counting Down" data-ta="எண்ணிக்கை">Counting Down</h2>
+      <h2 class="sec-title" id="cd-title" data-en="Counting Down" data-ta="கவுண்ட்டவுன்">Counting Down</h2>
       <p class="sec-sub" id="cd-sub" data-en="Until 27 June 2026 · 7:00 PM · Kuala Lumpur" data-ta="27 ஜூன் 2026 · மாலை 7:00 · கோலாலம்பூர்">Until 27 June 2026 · 7:00 PM · Kuala Lumpur</p>
     </div>
     <div class="cd-row reveal" style="transition-delay:.15s">
@@ -1570,7 +1589,7 @@ footer::after{
   <p class="ft-text">
     <span data-en="Shanmugam's 70th Birthday Celebration" data-ta="சண்முகம் அவர்களின் 70வது பிறந்தநாள் விழா">Shanmugam's 70th Birthday Celebration</span><br>
     <span data-en="27 June 2026 · The Banggles · Kuala Lumpur" data-ta="27 ஜூன் 2026 · தி பேங்கிள்ஸ் · கோலாலம்பூர்">27 June 2026 &nbsp;·&nbsp; The Banggles &nbsp;·&nbsp; Kuala Lumpur</span><br>
-    <span data-en="With Love &amp; Warmth from the Family" data-ta="குடும்பத்தினரின் அன்புடன்">With Love &amp; Warmth from the Family</span>
+    <span data-en="With Love &amp; Warmth from the Family" data-ta="அன்புடன் குடும்பத்தினர்">With Love &amp; Warmth from the Family</span>
   </p>
 </footer>
 
@@ -1972,7 +1991,7 @@ const T = {
     'det-main-time':     'இரவு 7:00 மணி முதல்',
     'det-body-time':     'கதவு திறக்கும் நேரம் 7:00 மணி<br>இரவு உணவு 7:30 மணிக்கு',
     'cd-eyebrow':        'எஞ்சிய நேரம்',
-    'cd-title':          'எண்ணிக்கை',
+    'cd-title':          'கவுண்ட்டவுன்',
     'cd-sub':            '27 ஜூன் 2026 · மாலை 7:00 · கோலாலம்பூர்',
     'cd-days':           'நாட்கள்','cd-hours':'மணி','cd-mins':'நிமிடங்கள்','cd-secs':'வினாடிகள்',
     'rsvp-btn':          'உறுதிப்படுத்தவும்',
