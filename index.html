@@ -1252,7 +1252,7 @@ footer::after{
 
     <!-- ★ THE NAME — crystal clear, unmissable ★ -->
     <span class="h-salutation" data-en="Mr" data-ta="திரு">Mr</span>
-    <h1 class="h-name" data-name="SHANMUGAM">SHANMUGAM</h1>
+    <h1 class="h-name" data-name="SHANMUGAM" data-en="SHANMUGAM" data-ta="சண்முகம்">SHANMUGAM</h1>
     <span class="h-father-name" data-en="Seerengam" data-ta="சீரெங்கம்">Seerengam</span>
 
     <div class="h-rule"></div>
@@ -2023,6 +2023,7 @@ function applyLang(lang){
   document.querySelectorAll('[data-en]:not(#nav-brand)').forEach(el=>{
     const val = el.getAttribute('data-'+lang);
     if(val) el.innerHTML = val;
+    if(el.hasAttribute('data-name') && val) el.setAttribute('data-name', val);
   });
 
   /* Specific IDs */
