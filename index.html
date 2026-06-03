@@ -1065,6 +1065,36 @@ footer::after{
 }
 .vid-retry-btn:hover{border-color:var(--g2);background:rgba(212,168,67,.1);}
 
+/* Permission steps */
+.vid-perm-steps{
+  width:100%;
+  background:rgba(212,168,67,.06);
+  border:1px solid rgba(212,168,67,.18);
+  border-radius:3px;
+  padding:16px 20px;
+  text-align:left;
+}
+.vid-perm-title{
+  font-family:'Didact Gothic',sans-serif;font-size:.56rem;
+  letter-spacing:.3em;text-transform:uppercase;
+  color:var(--g2);margin-bottom:12px;font-style:normal;
+}
+.vid-perm-list{
+  margin:0;padding:0 0 0 18px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.vid-perm-list li{
+  font-family:'Cormorant Garamond',serif;font-style:normal;
+  font-size:1rem;color:var(--cream);line-height:1.5;
+}
+.vid-perm-list li strong{color:var(--g3);}
+.vid-perm-list li code{
+  background:rgba(212,168,67,.12);
+  border:1px solid rgba(212,168,67,.2);
+  border-radius:2px;padding:1px 6px;
+  font-size:.9rem;color:var(--g4);font-style:normal;
+}
+
 /* Controls */
 .vid-controls{
   display:flex;align-items:center;justify-content:center;
@@ -1760,7 +1790,12 @@ footer::after{
             <!-- Camera denied -->
             <div class="vid-cam-error" id="vidCamError" style="display:none">
               <span id="vidCamErrorMsg"></span>
-              <button class="vid-retry-btn" id="vidRetryBtn" onclick="retryVidCamera()" style="display:none">Try Again</button>
+              <!-- Permission steps — shown only for NotAllowedError -->
+              <div class="vid-perm-steps" id="vidPermSteps" style="display:none">
+                <div class="vid-perm-title" id="vidPermTitle"></div>
+                <ol class="vid-perm-list" id="vidPermList"></ol>
+              </div>
+              <button class="vid-retry-btn" id="vidRetryBtn" onclick="retryVidCamera()" style="display:none">↺ Try Again</button>
             </div>
             <!-- Controls -->
             <div class="vid-controls" id="vidRecControls" style="display:none">
@@ -2421,7 +2456,7 @@ async function initVidCamera(){
 
   /* Check API availability (requires HTTPS) */
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    showVidCamError('🔒 Camera requires a secure (HTTPS) connection or is not supported by this browser. Please use the Upload tab.', false);
+    showVidCamError('🔒 Camera requires a secure (HTTPS) connection or is not supported by this browser. Please use the Upload tab.', false, false);
     return;
   }
 
@@ -2440,8 +2475,9 @@ async function initVidCamera(){
     switch(e.name){
       case 'NotAllowedError':
       case 'PermissionDeniedError':
-        msg   = '🔒 Camera permission was denied. Please allow camera & microphone access in your browser or device settings, then tap Try Again.';
-        break;
+        msg   = '🔒 Camera permission was denied. Follow the steps below to allow access, then tap Try Again.';
+        showVidCamError(msg, true, true);
+        return;
       case 'NotFoundError':
       case 'DevicesNotFoundError':
         msg   = '📷 No camera found on this device. Please use the Upload tab instead.';
@@ -2466,18 +2502,89 @@ async function initVidCamera(){
       default:
         msg = '📵 Could not access camera. Please use the Upload tab instead.';
     }
-    showVidCamError(msg, retry);
+    showVidCamError(msg, retry, false);
   }
 }
 
-function showVidCamError(msg, showRetry){
+function showVidCamError(msg, showRetry, showSteps){
   document.getElementById('vidCamErrorMsg').textContent = msg;
   document.getElementById('vidRetryBtn').style.display  = showRetry ? 'inline-block' : 'none';
-  document.getElementById('vidCamError').style.display  = 'flex';
+
+  const stepsWrap = document.getElementById('vidPermSteps');
+  if(showSteps){
+    const ua  = navigator.userAgent;
+    const ios = /iphone|ipad|ipod/i.test(ua);
+    const android = /android/i.test(ua);
+    const chrome  = /chrome/i.test(ua) && !/edg/i.test(ua);
+    const firefox = /firefox/i.test(ua);
+    const safari  = /safari/i.test(ua) && !chrome;
+    const samsung = /samsungbrowser/i.test(ua);
+
+    let title, steps;
+
+    if(ios && safari){
+      title = 'How to allow on iPhone / iPad (Safari)';
+      steps = [
+        'Tap <strong>AA</strong> or the <strong>🔒</strong> icon in the address bar',
+        'Tap <strong>Website Settings</strong>',
+        'Set <strong>Camera</strong> and <strong>Microphone</strong> to <strong>Allow</strong>',
+        'Tap <strong>Done</strong>, then tap <strong>↺ Try Again</strong> below',
+      ];
+    } else if(ios && chrome){
+      title = 'How to allow on iPhone / iPad (Chrome)';
+      steps = [
+        'Open <strong>Settings</strong> app on your iPhone',
+        'Scroll down and tap <strong>Chrome</strong>',
+        'Turn on <strong>Camera</strong> and <strong>Microphone</strong>',
+        'Come back here and tap <strong>↺ Try Again</strong> below',
+      ];
+    } else if(android && samsung){
+      title = 'How to allow on Android (Samsung Browser)';
+      steps = [
+        'Tap the <strong>🔒 lock icon</strong> in the address bar',
+        'Tap <strong>Permissions</strong>',
+        'Set <strong>Camera</strong> and <strong>Microphone</strong> to <strong>Allow</strong>',
+        'Tap <strong>↺ Try Again</strong> below',
+      ];
+    } else if(android){
+      title = 'How to allow on Android (Chrome)';
+      steps = [
+        'Tap the <strong>🔒 lock icon</strong> or <strong>ⓘ</strong> in the address bar',
+        'Tap <strong>Permissions</strong>',
+        'Set <strong>Camera</strong> and <strong>Microphone</strong> to <strong>Allow</strong>',
+        'Tap <strong>↺ Try Again</strong> below',
+      ];
+    } else if(firefox){
+      title = 'How to allow in Firefox';
+      steps = [
+        'Click the <strong>camera icon</strong> in the address bar (left side)',
+        'Click <strong>Blocked Temporarily</strong> → choose <strong>Allow</strong>',
+        'Tap <strong>↺ Try Again</strong> below',
+      ];
+    } else {
+      /* Chrome / Edge / desktop default */
+      title = 'How to allow in your browser';
+      steps = [
+        'Click the <strong>🔒 lock</strong> or <strong>camera 🎥</strong> icon in the address bar',
+        'Set <strong>Camera</strong> and <strong>Microphone</strong> to <strong>Allow</strong>',
+        'Refresh or tap <strong>↺ Try Again</strong> below',
+      ];
+    }
+
+    document.getElementById('vidPermTitle').textContent = title;
+    document.getElementById('vidPermList').innerHTML =
+      steps.map(s=>`<li>${s}</li>`).join('');
+    stepsWrap.style.display = 'block';
+  } else {
+    stepsWrap.style.display = 'none';
+  }
+
+  document.getElementById('vidCamError').style.display = 'flex';
 }
 
 function retryVidCamera(){
-  document.getElementById('vidCamError').style.display = 'none';
+  document.getElementById('vidCamError').style.display   = 'none';
+  document.getElementById('vidPermSteps').style.display  = 'none';
   initVidCamera();
 }
 
