@@ -1051,9 +1051,19 @@ footer::after{
 .vid-cam-error{
   text-align:center;padding:24px 16px;margin-bottom:14px;
   font-family:'Cormorant Garamond',serif;font-style:italic;
-  font-size:.95rem;color:rgba(212,168,67,.5);
+  font-size:.95rem;color:rgba(212,168,67,.6);
   border:1px dashed rgba(212,168,67,.2);border-radius:3px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
 }
+.vid-retry-btn{
+  font-family:'Didact Gothic',sans-serif;font-size:.58rem;
+  letter-spacing:.3em;text-transform:uppercase;
+  color:var(--g3);background:none;
+  border:1px solid rgba(212,168,67,.35);
+  padding:9px 22px;border-radius:2px;cursor:pointer;
+  transition:all .25s;
+}
+.vid-retry-btn:hover{border-color:var(--g2);background:rgba(212,168,67,.1);}
 
 /* Controls */
 .vid-controls{
@@ -1749,7 +1759,8 @@ footer::after{
             </div>
             <!-- Camera denied -->
             <div class="vid-cam-error" id="vidCamError" style="display:none">
-              📵 Camera not accessible — please use the Upload tab instead.
+              <span id="vidCamErrorMsg"></span>
+              <button class="vid-retry-btn" id="vidRetryBtn" onclick="retryVidCamera()" style="display:none">Try Again</button>
             </div>
             <!-- Controls -->
             <div class="vid-controls" id="vidRecControls" style="display:none">
@@ -2405,8 +2416,15 @@ let vidRecSecs  = 15;
 
 /* ── Camera ── */
 async function initVidCamera(){
-  document.getElementById('vidStartCam').style.display  = 'none';
-  document.getElementById('vidCamError').style.display  = 'none';
+  document.getElementById('vidStartCam').style.display = 'none';
+  document.getElementById('vidCamError').style.display = 'none';
+
+  /* Check API availability (requires HTTPS) */
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    showVidCamError('🔒 Camera requires a secure (HTTPS) connection or is not supported by this browser. Please use the Upload tab.', false);
+    return;
+  }
+
   try {
     vidStream = await navigator.mediaDevices.getUserMedia({
       video:{ facingMode:vidFacing, width:{ideal:1280}, height:{ideal:720} },
@@ -2418,8 +2436,49 @@ async function initVidCamera(){
     document.getElementById('vidCamWrap').style.display     = 'block';
     document.getElementById('vidRecControls').style.display = 'flex';
   } catch(e){
-    document.getElementById('vidCamError').style.display = 'block';
+    let msg, retry = true;
+    switch(e.name){
+      case 'NotAllowedError':
+      case 'PermissionDeniedError':
+        msg   = '🔒 Camera permission was denied. Please allow camera & microphone access in your browser or device settings, then tap Try Again.';
+        break;
+      case 'NotFoundError':
+      case 'DevicesNotFoundError':
+        msg   = '📷 No camera found on this device. Please use the Upload tab instead.';
+        retry = false;
+        break;
+      case 'NotReadableError':
+      case 'TrackStartError':
+        msg = '⚠️ Camera is currently in use by another app. Close it and tap Try Again.';
+        break;
+      case 'OverconstrainedError':
+        /* Retry without ideal constraints */
+        try {
+          vidStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+          const cam = document.getElementById('vidCamera');
+          cam.srcObject = vidStream;
+          cam.classList.toggle('vid-mirrored', vidFacing === 'user');
+          document.getElementById('vidCamWrap').style.display     = 'block';
+          document.getElementById('vidRecControls').style.display = 'flex';
+          return;
+        } catch(e2){ msg = '📵 Could not start camera. Please use the Upload tab instead.'; retry=false; }
+        break;
+      default:
+        msg = '📵 Could not access camera. Please use the Upload tab instead.';
+    }
+    showVidCamError(msg, retry);
   }
+}
+
+function showVidCamError(msg, showRetry){
+  document.getElementById('vidCamErrorMsg').textContent = msg;
+  document.getElementById('vidRetryBtn').style.display  = showRetry ? 'inline-block' : 'none';
+  document.getElementById('vidCamError').style.display  = 'flex';
+}
+
+function retryVidCamera(){
+  document.getElementById('vidCamError').style.display = 'none';
+  initVidCamera();
 }
 
 function stopVidStream(){
