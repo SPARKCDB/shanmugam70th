@@ -1010,21 +1010,23 @@ footer::after{
 .vid-cam-wrap video{width:100%;height:100%;object-fit:cover;}
 .vid-mirrored{transform:scaleX(-1);}
 
-.vid-start-cam{
+.vid-loading{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;padding:40px 20px;
-  border:2px dashed rgba(212,168,67,.22);border-radius:3px;
-  cursor:pointer;margin-bottom:14px;
-  transition:border-color .3s,background .3s;
+  gap:14px;padding:44px 20px;
+  border:1px solid rgba(212,168,67,.18);border-radius:3px;
+  margin-bottom:14px;
 }
-.vid-start-cam:hover{border-color:var(--g2);background:rgba(212,168,67,.04);}
-.vid-start-icon{font-size:2.2rem;}
-.vid-start-text{
-  font-family:'Italiana',serif;font-size:1.2rem;color:var(--cream);
+.vid-loading-spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid rgba(212,168,67,.15);
+  border-top-color:var(--g2);
+  animation:vidSpin .8s linear infinite;
+  display:block;
 }
-.vid-start-hint{
-  font-family:'Didact Gothic',sans-serif;font-size:.52rem;
-  letter-spacing:.28em;text-transform:uppercase;color:rgba(212,168,67,.4);
+@keyframes vidSpin{to{transform:rotate(360deg)}}
+.vid-loading-text{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:1rem;color:var(--g3);
 }
 
 .vid-timer-overlay{
@@ -1774,10 +1776,10 @@ footer::after{
           <!-- ── RECORD ── -->
           <div id="vidRecordSection">
             <!-- Start camera prompt -->
-            <div class="vid-start-cam" id="vidStartCam" onclick="initVidCamera()">
-              <span class="vid-start-icon">🎥</span>
-              <span class="vid-start-text" data-en="Tap to Start Camera" data-ta="கேமராவை தொடங்க தட்டவும்">Tap to Start Camera</span>
-              <span class="vid-start-hint" data-en="Camera &amp; microphone access needed" data-ta="கேமரா &amp; மைக்ரோஃபோன் அனுமதி தேவை">Camera &amp; microphone access needed</span>
+            <!-- Loading state while camera initialises -->
+            <div class="vid-loading" id="vidLoading" style="display:none">
+              <span class="vid-loading-spinner"></span>
+              <span class="vid-loading-text" data-en="Starting camera…" data-ta="கேமரா தொடங்குகிறது…">Starting camera…</span>
             </div>
             <!-- Live camera view -->
             <div class="vid-cam-wrap" id="vidCamWrap" style="display:none">
@@ -2145,6 +2147,8 @@ function pickAtt(btn,val){
   const sk=document.getElementById('vidSkip');
   vs.style.display='block';
   vs.style.animation='riseUp .6s ease';
+  /* Auto-start camera since Record tab is active by default */
+  initVidCamera();
   if(val==='yes'){
     vi.textContent='Add a video birthday wish for Shanmugam — a beautiful keepsake! (Optional)';
     sk.style.display='block';
@@ -2451,11 +2455,14 @@ let vidRecSecs  = 15;
 
 /* ── Camera ── */
 async function initVidCamera(){
-  document.getElementById('vidStartCam').style.display = 'none';
-  document.getElementById('vidCamError').style.display = 'none';
+  document.getElementById('vidLoading').style.display   = 'block';
+  document.getElementById('vidCamError').style.display  = 'none';
+  document.getElementById('vidCamWrap').style.display   = 'none';
+  document.getElementById('vidRecControls').style.display = 'none';
 
   /* Check API availability (requires HTTPS) */
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    document.getElementById('vidLoading').style.display = 'none';
     showVidCamError('🔒 Camera requires a secure (HTTPS) connection or is not supported by this browser. Please use the Upload tab.', false, false);
     return;
   }
@@ -2465,12 +2472,14 @@ async function initVidCamera(){
       video:{ facingMode:vidFacing, width:{ideal:1280}, height:{ideal:720} },
       audio: true
     });
+    document.getElementById('vidLoading').style.display = 'none';
     const cam = document.getElementById('vidCamera');
     cam.srcObject = vidStream;
     cam.classList.toggle('vid-mirrored', vidFacing === 'user');
     document.getElementById('vidCamWrap').style.display     = 'block';
     document.getElementById('vidRecControls').style.display = 'flex';
   } catch(e){
+    document.getElementById('vidLoading').style.display = 'none';
     let msg, retry = true;
     switch(e.name){
       case 'NotAllowedError':
@@ -2596,11 +2605,8 @@ function stopVidStream(){
 async function flipVidCamera(){
   vidFacing = vidFacing==='user' ? 'environment' : 'user';
   stopVidStream();
-  document.getElementById('vidCamWrap').style.display     = 'none';
-  document.getElementById('vidRecControls').style.display = 'none';
-  document.getElementById('vidStartCam').style.display    = 'flex';
-  document.getElementById('vidTimerOverlay').textContent  = '';
-  document.getElementById('vidRecIndicator').style.display= 'none';
+  document.getElementById('vidTimerOverlay').textContent   = '';
+  document.getElementById('vidRecIndicator').style.display = 'none';
   const rb=document.getElementById('recBtn');
   rb.classList.remove('recording'); rb.innerHTML='● REC';
   await initVidCamera();
@@ -2677,10 +2683,8 @@ function retakeVid(){
   const recActive = document.getElementById('tabRecord').classList.contains('active');
   if(recActive){
     document.getElementById('vidRecordSection').style.display = 'block';
-    document.getElementById('vidStartCam').style.display      = 'flex';
-    document.getElementById('vidCamWrap').style.display       = 'none';
-    document.getElementById('vidRecControls').style.display   = 'none';
     document.getElementById('vidCamError').style.display      = 'none';
+    initVidCamera();
   } else {
     document.getElementById('vidUploadSection').style.display = 'block';
     document.getElementById('vidFile').value = '';
@@ -2736,10 +2740,8 @@ function switchVidTab(tab, btn){
 
   if(tab==='record'){
     document.getElementById('vidRecordSection').style.display = 'block';
-    document.getElementById('vidStartCam').style.display      = 'flex';
-    document.getElementById('vidCamWrap').style.display       = 'none';
-    document.getElementById('vidRecControls').style.display   = 'none';
     document.getElementById('vidCamError').style.display      = 'none';
+    initVidCamera();
   } else {
     document.getElementById('vidUploadSection').style.display = 'block';
     document.getElementById('vidFile').value = '';
