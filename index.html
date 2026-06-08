@@ -1835,9 +1835,9 @@ footer::after{
           <!-- ── CONFIRMED ── -->
           <div id="vidConfirmedWrap" style="display:none">
             <div class="vid-confirmed">
-              <span class="vid-confirmed-icon">✓</span>
-              <span class="vid-confirmed-text" data-en="Video wish added!" data-ta="வீடியோ வாழ்த்து சேர்க்கப்பட்டது!">Video wish added!</span>
-              <button class="vid-change-btn" onclick="changeVid()" data-en="Change" data-ta="மாற்று">Change</button>
+              <span class="vid-confirmed-icon" id="vidConfirmedIcon">⏳</span>
+              <span class="vid-confirmed-text" id="vidConfirmedText" data-en="Uploading video wish…" data-ta="வீடியோ வாழ்த்து பதிவேற்றுகிறது…">Uploading video wish…</span>
+              <button class="vid-change-btn" id="vidChangeBtn" onclick="changeVid()" data-en="Change" data-ta="மாற்று" style="display:none">Change</button>
             </div>
           </div>
 
@@ -2188,7 +2188,8 @@ async function doRSVP(){
     dietary:      document.getElementById('dietary').value,
     relation:     document.getElementById('relation').value,
     msg:          document.getElementById('gmsg').value,
-    has_video:    vidBlob ? 'true' : 'false',
+    has_video:    vidUploadUrl ? 'true' : 'false',
+    video_url:    vidUploadUrl || '',
   });
 
   fetch(APPS_SCRIPT_URL, {
@@ -2445,13 +2446,32 @@ function toggleLang(){
 /* ══════════════════════════════════════════
    VIDEO WISH MODULE
 ══════════════════════════════════════════ */
-let vidStream   = null;
-let vidRecorder = null;
-let vidChunks   = [];
-let vidBlob     = null;
-let vidFacing   = 'user';   /* front camera */
-let vidRecTimer = null;
-let vidRecSecs  = 15;
+const VID_CLOUD  = 'doci6dnqx';
+const VID_PRESET = "Dad's Birthday";
+
+let vidStream      = null;
+let vidRecorder    = null;
+let vidChunks      = [];
+let vidBlob        = null;
+let vidFacing      = 'user';   /* front camera */
+let vidRecTimer    = null;
+let vidRecSecs     = 15;
+let vidUploadUrl   = null;     /* Cloudinary URL after upload */
+let vidUploadDone  = false;    /* upload settled */
+
+async function uploadToCloudinary(blob){
+  const fd = new FormData();
+  fd.append('file', blob, 'birthday-wish.webm');
+  fd.append('upload_preset', VID_PRESET);
+  fd.append('folder', 'shanmugam-70th');
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${VID_CLOUD}/video/upload`,
+    { method:'POST', body:fd }
+  );
+  if(!res.ok) throw new Error('Upload failed: ' + res.status);
+  const data = await res.json();
+  return data.secure_url;
+}
 
 /* ── Camera ── */
 async function initVidCamera(){
@@ -2692,15 +2712,42 @@ function retakeVid(){
 }
 
 function confirmVid(){
-  document.getElementById('vidPlayback').style.display      = 'none';
+  document.getElementById('vidPlayback').style.display = 'none';
   const cw = document.getElementById('vidConfirmedWrap');
   cw.style.display   = 'block';
   cw.style.animation = 'riseUp .4s ease';
-  document.getElementById('vidSkip').style.display = 'none';
+  document.getElementById('vidSkip').style.display    = 'none';
+  document.getElementById('vidChangeBtn').style.display = 'none';
+
+  /* Reset upload state */
+  vidUploadUrl  = null;
+  vidUploadDone = false;
+  document.getElementById('vidConfirmedIcon').textContent = '⏳';
+  document.getElementById('vidConfirmedText').textContent = 'Uploading video wish…';
+
+  /* Upload to Cloudinary in the background */
+  if(vidBlob){
+    uploadToCloudinary(vidBlob)
+      .then(url => {
+        vidUploadUrl  = url;
+        vidUploadDone = true;
+        document.getElementById('vidConfirmedIcon').textContent = '✓';
+        document.getElementById('vidConfirmedText').textContent = 'Video wish uploaded!';
+        document.getElementById('vidChangeBtn').style.display   = 'inline-block';
+      })
+      .catch(() => {
+        vidUploadDone = true;
+        document.getElementById('vidConfirmedIcon').textContent = '⚠️';
+        document.getElementById('vidConfirmedText').textContent = 'Upload failed — tap Change to retry.';
+        document.getElementById('vidChangeBtn').style.display   = 'inline-block';
+      });
+  }
 }
 
 function changeVid(){
-  vidBlob = null;
+  vidBlob      = null;
+  vidUploadUrl = null;
+  vidUploadDone= false;
   document.getElementById('vidConfirmedWrap').style.display = 'none';
   document.getElementById('vidSkip').style.display          = 'block';
   switchVidTab('record', document.getElementById('tabRecord'));
